@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Reactive gifs</title>
+
+    <link href="style.css" type="text/css" rel="stylesheet" />
+
+    <script src="traceur/traceur.js" type="text/javascript"></script>
+    <script src="traceur/bootstrap.js" type="text/javascript"></script>
+
+    <script src="lodash.js" type="text/javascript"></script>
+    <script src="jquery.js" type="text/javascript"></script>
+
+    <script type="module" src="program.js"></script>
+
+    <script type="tempalte/lodash" id="template-main">
+      <nav>
+        <%= filter %>
+        <%= input %>
+      </nav>
+      <main>
+        <%= stage %>
+        <ul id="items">
+          <%= images %>
+        </ul>
+      </main>
+    </script>
+
+    <script type="tempalte/lodash" id="template-filter">
+      <input placeholder="Filter" id="filter" type="text" />
+    </script>
+
+    <script type="tempalte/lodash" id="template-input">
+      <input id="input" placeholder="New image" type="text" name="url" />
+    </script>
+
+    <script type="tempalte/lodash" id="template-stage">
+      <figure id="stage">
+        <img src="" alt="" class="item" />
+        <figcaption>
+          <ul>
+          </ul>
+          <button data-action="add-tag" class="button" tabindex="-2">Add tag</button>
+          <button data-action="save" class="button" tabindex="-1">Save</button>
+        </figcaption>
+      </figure>
+    </script>
+
+    <script type="tempalte/lodash" id="template-images">
+      <%= items.join('\n') %>
+    </script>
+
+    <script type="tempalte/lodash" id="template-item">
+      <li data-tags="<%= tags.join(' ') %>">
+        <img src="<%- url %>" alt="" class="item" />
+        <button data-action="remove">X</button>
+      </li>
+    </script>
+
+    <style type="text/css" id="filter-style">
+    </style>
+  </head>
+  <body>
+  </body>
+</html>
