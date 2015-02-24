@@ -179,9 +179,13 @@ main {
   border-top-left-radius: 2px;
 }
 
+#items li .item {
+  display: block;
+}
+
 #items li button {
   position: absolute;
-  bottom: 3px;
+  bottom: 0;
   right: 0;
   border-bottom-left-radius: 0;
   border-top-right-radius: 0;

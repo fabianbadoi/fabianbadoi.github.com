@@ -90,7 +90,9 @@ $(function() {
   }
 
   function save() {
-    let tags = stageTagList.children().toArray().map(element => $.trim(element.innerText)).filter(txt => txt.length);
+    let tags = stageTagList.children().toArray()
+      .map(element => $.trim(element.textContent))
+      .filter(txt => txt.length);
     let url = stageImg.attr('src');
 
     let item = items.setItem(url, tags);
