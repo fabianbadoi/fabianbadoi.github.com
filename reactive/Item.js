@@ -1,27 +1,20 @@
-let url = Symbol('url');
-let tags = Symbol('tags');
-
 class Item {
-  constructor(uurl, ttags) {
-    this[url] = uurl;
-    this[tags] = ttags.map(str => str.toLowerCase());
+  constructor(url, tags) {
+    this.url = url;
+    this.tags = tags.map(str => str.toLowerCase());
 
     Object.freeze(this);
   }
 
-  get url() {
-    return this[url];
-  }
-
-  get tags() {
-    return this[tags];
-  }
-
   toString() {
-    return JSON.stringify({
+    return JSON.stringify(this);
+  }
+
+  toJSON() {
+    return {
       url: this.url,
       tags: this.tags
-    });
+    };
   }
 }
 

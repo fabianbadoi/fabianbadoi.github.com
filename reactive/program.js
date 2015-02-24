@@ -43,10 +43,50 @@ $(function() {
 
   let saveAndCleanup = (event) => {
     event.preventDefault();
-    save();
+    saveStage();
     cleanup();
   };
 
+  // import, export and clear
+  window.ReactiveImages = {
+    import(str) {
+      ItemSet.ofString(str);
+      itemList.html(items.getAll().map(itemTemplate));
+    },
+
+    ['export']() {
+      document.write(items);
+    },
+
+    clear() {
+      items.clear();
+      window.location.reload();
+    },
+
+    // export or clear only the filtered items
+    withFilter: {
+      ['export']() {
+        document.write(items.selectiveToString(getVisibleUrls()));
+      },
+
+      clear() {
+        let urls = getVisibleUrls();
+
+        items.selectiveClear(urls);
+        urls.forEach(removeItemFromDOM);
+      }
+    }
+  };
+  console.log(
+`Console commands:
+  ReactiveImages.export() -> writes export string to document
+  ReactiveImages.import(str) -> imports images
+  ReactiveImages.clear() -> Deletes all images
+  ReactiveImages.withFilter.export() -> exports only images that pass the filter
+  ReactiveImages.withFilter.clear() -> removes only images that pass the filter
+`);
+
+  // DOM events
   input.on('keyenter', event => { previewItem($.trim($(event.target).val())); addTag(); });
   stage.find('[data-action="add-tag"]').on('click', addTag);
   stage.find('[data-action="save"]').on('click', saveAndCleanup);
@@ -89,20 +129,32 @@ $(function() {
     li.focus();
   }
 
-  function save() {
+  function saveStage() {
     let tags = stageTagList.children().toArray()
       .map(element => $.trim(element.textContent))
       .filter(txt => txt.length);
     let url = stageImg.attr('src');
 
     let item = items.setItem(url, tags);
+    addItemToDOM(item);
+  }
 
+  function addItemToDOM(item) {
     itemList.append(itemTemplate(item));
+  }
+
+  function removeItemFromDOM(url) {
+    itemList.find(`.item[src="${url}"]`).parent().remove();
   }
 
   function cleanup() {
     stage.removeClass('active');
     stageImg.removeAttr('src');
     stageTagList.children().remove();
+  }
+
+  function getVisibleUrls() {
+    return itemList.find('.item:visible').toArray()
+      .map(item => item.getAttribute('src'))
   }
 });

@@ -9,9 +9,15 @@ let keyPrefix = 'ItemSet:item:';
 let keyPattern = new RegExp(keyPrefix);
 
 let singleton;
+let safeConstruct = false;
 
-class ItemSet {
+export default class ItemSet {
   constructor() {
+    // prevent direct calls to the constructor
+    if (!safeConstruct) {
+      throw new Error('You must use ItemSet.singleton() to create an ItemSet.');
+    }
+
     this[storage] = localStorage;
 
     this[items] = this[getLiveItems]();
@@ -37,6 +43,36 @@ class ItemSet {
 
   getAll() {
     return _.toArray(this[items]);
+  }
+
+  clear() {
+    _.each(this[items], (item, url) => this.removeItem(url));
+  }
+
+  toJSON() {
+    return this[items];
+  }
+
+  toString() {
+    return JSON.stringify(this);
+  }
+
+  selectiveClear(urls) {
+    _.each(this[items], item => {
+      if (urls.indexOf(item.url) >= 0) {
+        this.removeItem(item.url);
+      }
+    });
+  }
+
+  selectiveToString(urls) {
+    return JSON.stringify(_.reduce(this[items], (filtered, item) => {
+      if (urls.indexOf(item.url) >= 0) {
+        filtered[item.url] = item;
+      }
+
+      return filtered;
+    }, {}));
   }
 
   *[Symbol.iterator]() {
@@ -68,4 +104,26 @@ class ItemSet {
   }
 }
 
-export default { get singleton() { return singleton = singleton || new ItemSet(); }};
+Object.assign(ItemSet, {
+  ofString(str) {
+    let items = _.toArray(JSON.parse(str));
+    let set = ItemSet.singleton;
+
+    items.forEach(item => set.setItem(item.url, item.tags));
+
+    return set;
+  },
+
+  get singleton() {
+    safeConstruct = true;
+
+    if (!singleton) {
+      singleton = new ItemSet();
+    }
+    let instance = singleton;
+
+    safeConstruct = false;
+
+    return instance;
+  }
+});
